@@ -27,6 +27,9 @@ class _HomeScreenState extends State<HomeScreen> {
         children: <Widget>[
           for (var i = 0; i < 20; i++) AlicePage(page: i),
         ],
+        onPageChange: (int number) {
+          print(number);
+        },
       ),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.search),

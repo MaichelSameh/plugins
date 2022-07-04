@@ -5,13 +5,15 @@ import 'src/builders/index.dart';
 class PageTurn extends StatefulWidget {
   const PageTurn({
     Key? key,
-    this.duration = const Duration(milliseconds: 450),
-    this.cutoff = 0.6,
     this.backgroundColor = const Color(0xFFFFFFCC),
     required this.children,
+    this.duration = const Duration(milliseconds: 450),
     this.initialIndex = 0,
     this.lastPage,
     this.showDragCutoff = false,
+    this.cutoff = 0.6,
+    this.onPageChange,
+    this.tapToNavigate = true,
   }) : super(key: key);
 
   final Color backgroundColor;
@@ -21,6 +23,8 @@ class PageTurn extends StatefulWidget {
   final Widget? lastPage;
   final bool showDragCutoff;
   final double cutoff;
+  final void Function(int)? onPageChange;
+  final bool tapToNavigate;
 
   @override
   PageTurnState createState() => PageTurnState();
@@ -136,6 +140,7 @@ class PageTurnState extends State<PageTurn> with TickerProviderStateMixin {
       setState(() {
         pageNumber++;
       });
+    widget.onPageChange?.call(pageNumber);
   }
 
   Future previousPage() async {
@@ -145,6 +150,8 @@ class PageTurnState extends State<PageTurn> with TickerProviderStateMixin {
       setState(() {
         pageNumber--;
       });
+
+    widget.onPageChange?.call(pageNumber);
   }
 
   Future goToPage(int index) async {
@@ -181,42 +188,43 @@ class PageTurnState extends State<PageTurn> with TickerProviderStateMixin {
               if (widget.lastPage != null) ...[
                 widget.lastPage!,
               ],
-              if (pages.isEmpty)
+              if (pages.isNotEmpty)
                 ...pages
               else ...[
-                Container(child: CircularProgressIndicator()),
+                Center(child: CircularProgressIndicator()),
               ],
-              Positioned.fill(
-                child: Flex(
-                  direction: Axis.horizontal,
-                  children: <Widget>[
-                    Flexible(
-                      flex: (widget.cutoff * 10).round(),
-                      child: Container(
-                        color: widget.showDragCutoff
-                            ? Colors.blue.withAlpha(100)
-                            : null,
-                        child: GestureDetector(
-                          behavior: HitTestBehavior.opaque,
-                          onTap: _isFirstPage ? null : previousPage,
+              if (widget.tapToNavigate)
+                Positioned.fill(
+                  child: Flex(
+                    direction: Axis.horizontal,
+                    children: <Widget>[
+                      Flexible(
+                        flex: (widget.cutoff * 10).round(),
+                        child: Container(
+                          color: widget.showDragCutoff
+                              ? Colors.blue.withAlpha(100)
+                              : null,
+                          child: GestureDetector(
+                            behavior: HitTestBehavior.opaque,
+                            onTap: _isFirstPage ? null : previousPage,
+                          ),
                         ),
                       ),
-                    ),
-                    Flexible(
-                      flex: 10 - (widget.cutoff * 10).round(),
-                      child: Container(
-                        color: widget.showDragCutoff
-                            ? Colors.red.withAlpha(100)
-                            : null,
-                        child: GestureDetector(
-                          behavior: HitTestBehavior.opaque,
-                          onTap: _isLastPage ? null : nextPage,
+                      Flexible(
+                        flex: 10 - (widget.cutoff * 10).round(),
+                        child: Container(
+                          color: widget.showDragCutoff
+                              ? Colors.red.withAlpha(100)
+                              : null,
+                          child: GestureDetector(
+                            behavior: HitTestBehavior.opaque,
+                            onTap: _isLastPage ? null : nextPage,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
             ],
           ),
         ),
