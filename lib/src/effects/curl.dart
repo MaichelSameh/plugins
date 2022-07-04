@@ -58,14 +58,6 @@ class PageTurnEffect extends CustomPainter {
       c.drawRect(
           pageRect, Paint()..color = backgroundColor ?? Colors.transparent);
     }
-    if (pos != 0) {
-      c.drawRect(
-        pageRect,
-        Paint()
-          ..color = Colors.black54
-          ..maskFilter = MaskFilter.blur(BlurStyle.outer, shadowSigma),
-      );
-    }
 
     final ip = Paint();
     for (double x = 0; x < size.width; x++) {
